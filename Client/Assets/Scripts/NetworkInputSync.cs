@@ -5,6 +5,11 @@ using UnityEngine;
 [RequireComponent(typeof(NetworkClient))]
 public class NetworkInputSync : MonoBehaviour
 {
+    [Tooltip("The distance to be moved in each move input")]
+    [SerializeField] float moveDistance = 1f;
+    [Tooltip("The step length while moving towards the desired position")]
+    [SerializeField] float stepDistance = 1f;
+    
     NetworkClient client;
 
     void Start()
@@ -15,19 +20,49 @@ public class NetworkInputSync : MonoBehaviour
     void Update()
     {
         if(client.id != "")
-            SendMoveInput();
+        {
+            string userInput = SendMoveInput();
+            Move(userInput);
+        }
     }
 
-    void SendMoveInput()
+    string SendMoveInput()
     {
+        string input = "";
         if(Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            client.SendPacket("a");
+            input = "a";
         else if(Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            client.SendPacket("d");
+            input = "d";
         
         if(Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
-            client.SendPacket("w");
+            input = "w";
         else if(Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-            client.SendPacket("s");
+            input = "s";
+        
+        if(input != "")
+            client.SendPacket(input);
+        return input;
     }
+
+    public void Move(string userInput)
+    {
+        Vector3 newPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        if(userInput == "a")
+            newPos.x -= moveDistance;
+        else if(userInput == "d")
+            newPos.x += moveDistance;
+        else if(userInput == "w")
+            newPos.y += moveDistance;
+        else if(userInput == "s")
+            newPos.y -= moveDistance;
+        StartCoroutine(MoveTo(newPos));
+    }
+
+    public IEnumerator MoveTo(Vector3 end){
+    while (Vector3.Distance(transform.position,end) > stepDistance){
+        transform.position = Vector3.MoveTowards(transform.position, end, stepDistance);
+        yield return 0;
+    }
+    transform.position = end;
+}
 }

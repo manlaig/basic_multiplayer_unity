@@ -8,16 +8,33 @@ using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 
+public class StateHistory
+{
+    public Vector3 position;
+
+    public StateHistory(Vector3 pos)
+    {
+        position = pos;
+    }
+}
+
 public class NetworkClient : MonoBehaviour
 {
     // set it to your server address
     [SerializeField] string serverIP = "127.0.0.1";
-    [SerializeField] int port = 8080; 
+    [SerializeField] int port = 8080;
 
+    #region "Public Members"
     public string id { get; private set; }
+    public int packetNumber { get; private set; }
+    public Dictionary<int, StateHistory> history;
+    #endregion
+
+    #region "Private Members"
     Dictionary<string, GameObject> otherClients;
-    Socket s;
+    Socket udp;
     IPEndPoint endPoint;
+    #endregion
 
     void Awake()
     {
@@ -26,44 +43,49 @@ public class NetworkClient : MonoBehaviour
         if(port == -1)
             Debug.LogError("Port not set");
 
+        packetNumber = 0;
         otherClients = new Dictionary<string, GameObject>();
+        history = new Dictionary<int, StateHistory>();
         endPoint = new IPEndPoint(IPAddress.Parse(serverIP), port);
-
-        s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        s.Blocking = false;
+        udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        udp.Blocking = false;
 
         // n stands for new user
-        SendInitialReqToServer("n");
         // server will reply with a unique id for this user
+        SendInitialReqToServer();
+        history.Add(0, new StateHistory(transform.position));
     }
 
-    void SendInitialReqToServer(string header)
+    void SendInitialReqToServer()
     {   
         // TODO: send rotation also
-        string p = header + " " + transform.position.x + " " + transform.position.y
+        string p = "n " + transform.position.x + " " + transform.position.y
                 + " " + transform.position.z;
 
         byte[] packet = Encoding.ASCII.GetBytes(p);
-        s.SendTo(packet, endPoint);
+        udp.SendTo(packet, endPoint);
     }
 
     public void SendPacket(string str)
     {
-        byte[] arr = Encoding.ASCII.GetBytes(id + " " + str);
-        s.SendTo(arr, endPoint);
+        history.Add(++packetNumber, new StateHistory(transform.position));
+        byte[] arr = Encoding.ASCII.GetBytes(packetNumber + " " + id + " " + str);
+        udp.SendTo(arr, endPoint);
     }
 
     void Update()
     {
-        if(s.Available != 0)
+        if(udp.Available != 0)
         {
             byte[] buffer = new byte[64];
-            s.Receive(buffer);
+            udp.Receive(buffer);
 
             string data = Encoding.Default.GetString(buffer);
 
             string parsedID = Regex.Match(data, @"c\d+t").Value;
             if(parsedID == "")  return;
+            int seqNumber = 0;
+            int.TryParse(Regex.Match(data, @"(?<seqNum>\d+) c\d+t").Value, out seqNumber);
             
             // means the server sending the unique id of the client
             if(data[0] == 'a')
@@ -73,12 +95,16 @@ public class NetworkClient : MonoBehaviour
                 return;
             }
 
-            if(parsedID.Equals(id))
-                transform.position = ParsePosition(data);
+            Vector3 posInPacket = ParsePosition(data);
+            if(parsedID.Equals(id) && history.ContainsKey(seqNumber) && history[seqNumber].position != posInPacket)
+            {
+                transform.position = posInPacket;
+                Debug.Log("You're at " + posInPacket);
+            }
             else if(otherClients.ContainsKey(parsedID))
-                otherClients[parsedID].transform.position = ParsePosition(data);
-            else
-                AddOtherClient(parsedID, ParsePosition(data));
+                otherClients[parsedID].transform.position = posInPacket;
+            else if(!parsedID.Equals(id))
+                AddOtherClient(parsedID, posInPacket);
         }
     }
 

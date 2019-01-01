@@ -8,25 +8,49 @@ using System.Text;
 
 class Client
 {
+    internal class StateHistory
+    {
+        public Vector3 position;
+        public StateHistory(Vector3 pos)
+        {
+            this.position = pos;
+        }
+    }
+    
     public string id;
+    public Dictionary<int, StateHistory> history;
     public Vector3 position;
+    public int lastSeqNumber;
 
     public Client(string i, Vector3 p)
     {
         id = i;
         position = p;
+        lastSeqNumber = 0;
+        history = new Dictionary<int, StateHistory>();
+        history.Add(0, new StateHistory(position));
     }
 
     public override string ToString()
     {
-        return id + " " + position.x + " " + position.y + " " + position.z;
+        StringBuilder str = new StringBuilder();
+        str.Append(lastSeqNumber);
+        str.Append(" ");
+        str.Append(id);
+        str.Append(" ");
+        str.Append(position.x);
+        str.Append(" ");
+        str.Append(position.y);
+        str.Append(" ");
+        str.Append(position.z);
+        return str.ToString();
     }
 }
 
 public class Server : MonoBehaviour
 {
     Socket socket;
-    int idIndex = 0; // used for assigning IDs
+    int idAssignIndex = 0;
     Dictionary<EndPoint, Client> clients;
 
     void Start()
@@ -58,7 +82,7 @@ public class Server : MonoBehaviour
 
             if(info[0] == 'n')
                 HandleNewClient(temp, info);
-            else if(rec > 0 && info[0] == 'c')
+            else if(rec > 0)
             {
                 HandleUserMoveInput(temp, info);
             }
@@ -67,7 +91,7 @@ public class Server : MonoBehaviour
 
     void HandleNewClient(EndPoint addr, string data)
     {
-        string id = "c" + idIndex++ + "t";
+        string id = "c" + idAssignIndex++ + "t";
         Debug.Log("Handling new client with id " + id);
         
         SendPacket("a " + id, addr);
@@ -83,15 +107,27 @@ public class Server : MonoBehaviour
 
     void HandleUserMoveInput(EndPoint client, string info)
     {
-        Regex pattern = new Regex(@"(?<id>c\d+t) (?<input>[aswd])");
+        Regex pattern = new Regex(@"(?<seqNumber>\d+) (?<id>c\d+t) (?<input>[aswd])");
         Match match = pattern.Match(info);
+        if(match.Value == "")   return;
+
+        int seqNumber = 0;
+        bool res = int.TryParse(match.Groups["seqNumber"].Value, out seqNumber);
+        if(!res)    return;
+
         string id = match.Groups["id"].Value;
         string userInput = match.Groups["input"].Value;
         
         if(id != "" && userInput != "")
         {
+            if(!clients[client].history.ContainsKey(seqNumber))
+            {
+                clients[client].history.Add(seqNumber, new Client.StateHistory(clients[client].position));
+                clients[client].lastSeqNumber = seqNumber;
+            }
             UpdatePosition(client, userInput);
-            SendPositionToAllClients();
+            foreach(KeyValuePair<EndPoint, Client> p in clients)
+                SendPacket(clients[client].ToString(), p.Key);
         }
     }
 
