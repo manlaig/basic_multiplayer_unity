@@ -82,18 +82,20 @@ public class Server : MonoBehaviour
         if(socket.Available != 0)
         {
             byte[] packet = new byte[64];
-            EndPoint temp = new IPEndPoint(IPAddress.Any, 1025);
+            EndPoint sender = new IPEndPoint(IPAddress.Any, 1025);
 
-            int rec = socket.ReceiveFrom(packet, ref temp);
+            int rec = socket.ReceiveFrom(packet, ref sender);
             string info = Encoding.Default.GetString(packet);
 
             Debug.Log("Server received: " + info);
 
             if(info[0] == 'n')
-                HandleNewClient(temp, info);
+                HandleNewClient(sender, info);
+            else if(info[0] == 'e')
+                DisconnectClient(sender);
             else if(rec > 0)
             {
-                HandleUserMoveInput(temp, info);
+                HandleUserMoveInput(sender, info);
             }
         }
     }
@@ -112,6 +114,13 @@ public class Server : MonoBehaviour
         clients.Add(addr, new Client(id, pos));
 
         SendPositionToAllClients();
+    }
+
+    void DisconnectClient(EndPoint sender)
+    {
+        clients.Remove(sender);
+        //SendPositionToAllClients(); /* THIS DOESN'T FIX THE ISSUE EITHER */
+        /* TODO: THIS DOESN'T DELETE GAMEOBJECTS THAT ARE DISCONNECTED BUT ALREADY DRAWN */
     }
 
     void HandleUserMoveInput(EndPoint client, string info)

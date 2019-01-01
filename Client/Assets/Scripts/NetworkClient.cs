@@ -67,6 +67,11 @@ public class NetworkClient : MonoBehaviour
 
     public void SendPacket(string str)
     {
+        if(id == null || id == "")
+        {
+            Debug.LogError("NOT Connected to server! (hint: start the server and then play the scene again");
+            return;
+        }
         UpdateStateHistory();
         byte[] arr = Encoding.ASCII.GetBytes(packetNumber + " " + id + " " + str);
         udp.SendTo(arr, endPoint);
@@ -79,6 +84,12 @@ public class NetworkClient : MonoBehaviour
         {
             // shrink the history
         }
+    }
+
+    void OnApplicationQuit()
+    {
+        byte[] arr = Encoding.ASCII.GetBytes("e " + id);
+        udp.SendTo(arr, endPoint);
     }
 
     void Update()
