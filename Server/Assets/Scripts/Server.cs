@@ -126,8 +126,7 @@ public class Server : MonoBehaviour
                 clients[client].lastSeqNumber = seqNumber;
             }
             UpdatePosition(client, userInput);
-            foreach(KeyValuePair<EndPoint, Client> p in clients)
-                SendPacket(clients[client].ToString(), p.Key);
+            SendPositionToAllClients(); /* so that clients see newly connected clients */
         }
     }
 

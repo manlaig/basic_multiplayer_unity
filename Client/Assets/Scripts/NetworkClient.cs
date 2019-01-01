@@ -58,7 +58,6 @@ public class NetworkClient : MonoBehaviour
 
     void SendInitialReqToServer()
     {   
-        // TODO: send rotation also
         string p = "n " + transform.position.x + " " + transform.position.y
                 + " " + transform.position.z;
 
@@ -81,11 +80,10 @@ public class NetworkClient : MonoBehaviour
             udp.Receive(buffer);
 
             string data = Encoding.Default.GetString(buffer);
+            int seqNumber = ParseSequenceNumber(data);
 
             string parsedID = Regex.Match(data, @"c\d+t").Value;
             if(parsedID == "")  return;
-            int seqNumber = 0;
-            int.TryParse(Regex.Match(data, @"(?<seqNum>\d+) c\d+t").Value, out seqNumber);
             
             // means the server sending the unique id of the client
             if(data[0] == 'a')
@@ -99,13 +97,22 @@ public class NetworkClient : MonoBehaviour
             if(parsedID.Equals(id) && history.ContainsKey(seqNumber) && history[seqNumber].position != posInPacket)
             {
                 transform.position = posInPacket;
-                Debug.Log("You're at " + posInPacket);
+                Debug.Log("Server-Client position mismatch, you're at " + posInPacket);
             }
             else if(otherClients.ContainsKey(parsedID))
                 otherClients[parsedID].transform.position = posInPacket;
             else if(!parsedID.Equals(id))
                 AddOtherClient(parsedID, posInPacket);
         }
+    }
+
+    int ParseSequenceNumber(string data)
+    {
+        Match match = Regex.Match(data, @"(?<seqNumber>\d+) c\d+t");
+        int seqNumber = -1;
+        if(!int.TryParse(match.Groups["seqNumber"].Value, out seqNumber))
+            return -1;
+        return seqNumber;
     }
 
     Vector3 ParsePosition(string data)

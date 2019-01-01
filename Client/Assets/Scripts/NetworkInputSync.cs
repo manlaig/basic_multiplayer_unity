@@ -21,12 +21,16 @@ public class NetworkInputSync : MonoBehaviour
     {
         if(client.id != "")
         {
-            string userInput = SendMoveInput();
-            Move(userInput);
+            string userInput = GetMoveInput();
+            if(userInput != "")
+            {
+                Move(userInput);
+                client.SendPacket(userInput);
+            }
         }
     }
 
-    string SendMoveInput()
+    string GetMoveInput()
     {
         string input = "";
         if(Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
@@ -38,9 +42,6 @@ public class NetworkInputSync : MonoBehaviour
             input = "w";
         else if(Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
             input = "s";
-        
-        if(input != "")
-            client.SendPacket(input);
         return input;
     }
 
@@ -55,14 +56,17 @@ public class NetworkInputSync : MonoBehaviour
             newPos.y += moveDistance;
         else if(userInput == "s")
             newPos.y -= moveDistance;
-        StartCoroutine(MoveTo(newPos));
+        //StartCoroutine(MoveTo(newPos));
+        transform.position = newPos;
     }
 
-    public IEnumerator MoveTo(Vector3 end){
-    while (Vector3.Distance(transform.position,end) > stepDistance){
-        transform.position = Vector3.MoveTowards(transform.position, end, stepDistance);
-        yield return 0;
+    public IEnumerator MoveTo(Vector3 end)
+    {
+        while (Vector3.Distance(transform.position,end) > stepDistance)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, end, stepDistance);
+            yield return 0;
+        }
+        transform.position = end;
     }
-    transform.position = end;
-}
 }
