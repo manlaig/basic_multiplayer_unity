@@ -31,6 +31,15 @@ class Client
         history.Add(0, new StateHistory(position));
     }
 
+    public void UpdateStateHistory(int seqNumber)
+    {
+        history.Add(seqNumber, new Client.StateHistory(position));
+        if(history.Count >= 50)
+        {
+            // shrink the history
+        }
+    }
+
     public override string ToString()
     {
         StringBuilder str = new StringBuilder();
@@ -122,7 +131,7 @@ public class Server : MonoBehaviour
         {
             if(!clients[client].history.ContainsKey(seqNumber))
             {
-                clients[client].history.Add(seqNumber, new Client.StateHistory(clients[client].position));
+                clients[client].UpdateStateHistory(seqNumber);
                 clients[client].lastSeqNumber = seqNumber;
             }
             UpdatePosition(client, userInput);

@@ -67,9 +67,18 @@ public class NetworkClient : MonoBehaviour
 
     public void SendPacket(string str)
     {
-        history.Add(++packetNumber, new StateHistory(transform.position));
+        UpdateStateHistory();
         byte[] arr = Encoding.ASCII.GetBytes(packetNumber + " " + id + " " + str);
         udp.SendTo(arr, endPoint);
+    }
+
+    public void UpdateStateHistory()
+    {
+        history.Add(++packetNumber, new StateHistory(transform.position));
+        if(history.Count >= 50)
+        {
+            // shrink the history
+        }
     }
 
     void Update()
