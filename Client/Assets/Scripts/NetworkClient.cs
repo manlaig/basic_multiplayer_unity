@@ -96,6 +96,7 @@ public class NetworkClient : MonoBehaviour
     {
         byte[] arr = Encoding.ASCII.GetBytes("e " + id);
         udp.SendTo(arr, endPoint);
+        udp.Close();
     }
 
     void Update()
