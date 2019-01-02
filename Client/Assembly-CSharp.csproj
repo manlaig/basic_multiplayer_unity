@@ -55,6 +55,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\ClientSidePrediction.cs" />
      <Compile Include="Assets\Scripts\NetworkClient.cs" />
+     <Compile Include="Assets\Scripts\NetworkClientDisplay.cs" />
      <Compile Include="Assets\Scripts\NetworkInputSync.cs" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>/Users/Ganaa/Desktop/basic_multiplayer_unity/Client/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>

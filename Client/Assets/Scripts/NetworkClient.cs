@@ -18,6 +18,7 @@ public class StateHistory
     }
 }
 
+[RequireComponent(typeof(NetworkClientDisplay))]
 public class NetworkClient : MonoBehaviour
 {
     // set it to your server address
@@ -33,6 +34,7 @@ public class NetworkClient : MonoBehaviour
 
     #region "Private Members"
     Dictionary<string, GameObject> otherClients;
+    NetworkClientDisplay otherClientMover;
     Socket udp;
     IPEndPoint endPoint;
     #endregion
@@ -46,6 +48,7 @@ public class NetworkClient : MonoBehaviour
 
         packetNumber = 0;
         desiredPosition = transform.position;
+        otherClientMover = GetComponent<NetworkClientDisplay>();
         otherClients = new Dictionary<string, GameObject>();
         history = new Dictionary<int, StateHistory>();
         endPoint = new IPEndPoint(IPAddress.Parse(serverIP), port);
@@ -123,7 +126,7 @@ public class NetworkClient : MonoBehaviour
                 Debug.Log("Server-Client position mismatch, you're at " + posInPacket);
             }
             else if(otherClients.ContainsKey(parsedID))
-                otherClients[parsedID].transform.position = posInPacket;
+                otherClientMover.Move(otherClients[parsedID], posInPacket);
             else if(!parsedID.Equals(id))
                 AddOtherClient(parsedID, posInPacket);
         }
