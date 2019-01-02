@@ -67,7 +67,6 @@ public class Server : MonoBehaviour
         clients = new Dictionary<EndPoint, Client>();
 
         IPHostEntry host = Dns.Resolve(Dns.GetHostName());
-        //IPHostEntry host = Dns.Resolve("127.0.0.1");
         IPAddress ip = host.AddressList[0];
         IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8080);
 
@@ -125,6 +124,8 @@ public class Server : MonoBehaviour
 
     void HandleUserMoveInput(EndPoint client, string info)
     {
+        if(!clients.ContainsKey(client))
+            return;
         Regex pattern = new Regex(@"(?<seqNumber>\d+) (?<id>c\d+t) (?<input>[aswd])");
         Match match = pattern.Match(info);
         if(match.Value == "")   return;
@@ -138,6 +139,8 @@ public class Server : MonoBehaviour
         
         if(id != "" && userInput != "")
         {
+            if(clients[client].lastSeqNumber > seqNumber)
+                return;
             if(!clients[client].history.ContainsKey(seqNumber))
             {
                 clients[client].UpdateStateHistory(seqNumber);

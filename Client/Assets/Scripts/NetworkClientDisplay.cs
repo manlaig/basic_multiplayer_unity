@@ -58,7 +58,6 @@ public class NetworkClientDisplay : MonoBehaviour
             {
                 if(user.progress < 1f)
                 {
-                    Debug.Log("lerping other user: " + user.go.transform.position);
                     user.progress += Time.deltaTime * user.speed;
                     user.go.transform.position = Vector3.Lerp(user.start, user.dest, user.progress);
                 } else
