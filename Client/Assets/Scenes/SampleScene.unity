@@ -297,6 +297,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serverIP: 192.168.1.153
   port: 8080
+  desiredPosition: {x: 0, y: 0, z: 0}
 --- !u!4 &1066636334
 Transform:
   m_ObjectHideFlags: 0
@@ -368,3 +369,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40fccc065bd914405b82c8cce8494f41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveDistance: 1
+  speed: 10

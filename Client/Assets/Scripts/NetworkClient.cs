@@ -28,6 +28,7 @@ public class NetworkClient : MonoBehaviour
     public string id { get; private set; }
     public int packetNumber { get; private set; }
     public Dictionary<int, StateHistory> history;
+    public Vector3 desiredPosition;
     #endregion
 
     #region "Private Members"
@@ -44,6 +45,7 @@ public class NetworkClient : MonoBehaviour
             Debug.LogError("Port not set");
 
         packetNumber = 0;
+        desiredPosition = transform.position;
         otherClients = new Dictionary<string, GameObject>();
         history = new Dictionary<int, StateHistory>();
         endPoint = new IPEndPoint(IPAddress.Parse(serverIP), port);
@@ -79,7 +81,8 @@ public class NetworkClient : MonoBehaviour
 
     public void UpdateStateHistory()
     {
-        history.Add(++packetNumber, new StateHistory(transform.position));
+        /* using desiredPosition because transform.position is used for lerping to desired position */
+        history.Add(++packetNumber, new StateHistory(desiredPosition));
         if(history.Count >= 50)
         {
             // shrink the history
