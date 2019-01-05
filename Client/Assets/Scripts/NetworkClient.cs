@@ -75,6 +75,7 @@ public class NetworkClient : MonoBehaviour
         if(id == null || id == "")
         {
             Debug.LogError("NOT Connected to server! (hint: start the server and then play the scene again");
+            SendInitialReqToServer();
             return;
         }
         UpdateStateHistory();
@@ -128,8 +129,10 @@ public class NetworkClient : MonoBehaviour
             Vector3 posInPacket = ParsePosition(data);
             if(parsedID.Equals(id) && history.ContainsKey(seqNumber) && history[seqNumber].position != posInPacket)
             {
-                transform.position = posInPacket;
                 Debug.Log("Server-Client position mismatch, you're at " + posInPacket);
+                /* the authorative server will control the user's position if they mismatch */
+                otherClientMover.usersToInterpolate.Remove(gameObject);
+                transform.position = posInPacket;
             }
             else if(otherClients.ContainsKey(parsedID))
                 otherClientMover.Move(otherClients[parsedID], posInPacket);
