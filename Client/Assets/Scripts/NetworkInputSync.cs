@@ -48,9 +48,11 @@ public class NetworkInputSync : MonoBehaviour
 
     public void Move(string userInput)
     {
-        if(clientMover.isClientMoving)
+        // to prevent mismatch between server and client
+        if(clientMover.usersToInterpolate.ContainsKey(gameObject) && clientMover.usersToInterpolate[gameObject].isMoving)
             transform.position = client.desiredPosition;
         Vector3 newPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+
         if(userInput == "a")
             newPos.x -= moveDistance;
         else if(userInput == "d")
@@ -60,6 +62,8 @@ public class NetworkInputSync : MonoBehaviour
         else if(userInput == "s")
             newPos.y -= moveDistance;
         
+        client.desiredPosition = newPos;
+        //interpolate client to newPos
         clientMover.Move(gameObject, newPos);
     }
 }

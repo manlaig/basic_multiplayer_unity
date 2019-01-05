@@ -34,10 +34,7 @@ class Client
     public void UpdateStateHistory(int seqNumber)
     {
         history.Add(seqNumber, new Client.StateHistory(position));
-        if(history.Count >= 50)
-        {
-            // shrink the history
-        }
+        bool suc = history.Remove(lastSeqNumber - 5);
     }
 
     public override string ToString()
@@ -59,6 +56,7 @@ class Client
 public class Server : MonoBehaviour
 {
     Socket socket;
+    int port = 8080;
     int idAssignIndex = 0;
     Dictionary<EndPoint, Client> clients;
 
@@ -68,9 +66,10 @@ public class Server : MonoBehaviour
 
         IPHostEntry host = Dns.Resolve(Dns.GetHostName());
         IPAddress ip = host.AddressList[0];
-        IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 8080);
+        IPEndPoint endPoint = new IPEndPoint(ip, port);
 
         Debug.Log("Server IP Address: " + ip);
+        Debug.Log("Port: " + port);
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         socket.Bind(endPoint);
         socket.Blocking = false;
@@ -81,7 +80,7 @@ public class Server : MonoBehaviour
         if(socket.Available != 0)
         {
             byte[] packet = new byte[64];
-            EndPoint sender = new IPEndPoint(IPAddress.Any, 1025);
+            EndPoint sender = new IPEndPoint(IPAddress.Any, port);
 
             int rec = socket.ReceiveFrom(packet, ref sender);
             string info = Encoding.Default.GetString(packet);
@@ -91,7 +90,7 @@ public class Server : MonoBehaviour
             if(info[0] == 'n')
                 HandleNewClient(sender, info);
             else if(info[0] == 'e')
-                DisconnectClient(sender);
+                DisconnectClient(sender, info);
             else if(rec > 0)
             {
                 HandleUserMoveInput(sender, info);
@@ -115,11 +114,16 @@ public class Server : MonoBehaviour
         SendPositionToAllClients();
     }
 
-    void DisconnectClient(EndPoint sender)
+    void DisconnectClient(EndPoint sender, string data)
     {
         clients.Remove(sender);
-        //SendPositionToAllClients(); /* THIS DOESN'T FIX THE ISSUE EITHER */
-        /* TODO: THIS DOESN'T DELETE GAMEOBJECTS THAT ARE DISCONNECTED BUT ALREADY DRAWN */
+        Broadcast(data);
+    }
+
+    void Broadcast(string data)
+    {
+        foreach(KeyValuePair<EndPoint, Client> p in clients)
+            SendPacket(data, p.Key);
     }
 
     void HandleUserMoveInput(EndPoint client, string info)

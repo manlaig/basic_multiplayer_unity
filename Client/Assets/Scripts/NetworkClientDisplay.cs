@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// class used for lerping other clients' position
-class UserInterpolation
+// class used for lerping clients' position
+public class UserInterpolation
 {
     internal Vector3 start, dest;
     internal float speed, progress;
-    internal GameObject go;
     internal bool isMoving;
 
-    internal UserInterpolation(GameObject ins, Vector3 destination, float sp)
+    internal UserInterpolation(Vector3 startV, Vector3 destination, float sp)
     {
-        go = ins;
-        start = ins.transform.position;
+        start = startV;
         dest = destination;
         speed = sp;
         progress = 0f;
@@ -26,70 +24,34 @@ public class NetworkClientDisplay : MonoBehaviour
 {
     [Tooltip("The step length while moving towards the desired position")]
     [SerializeField] float speed = 10f;
-
-    public bool isClientMoving {get; private set; }
     
-    HashSet<UserInterpolation> otherUsers;
-    Vector3 start;
-    float progress = 0f;
+    public Dictionary<GameObject, UserInterpolation> usersToInterpolate;
     NetworkClient client; 
 
     void Start()
     {
         client = GetComponent<NetworkClient>();
-        otherUsers = new HashSet<UserInterpolation>();
+        usersToInterpolate = new Dictionary<GameObject, UserInterpolation>();
     }
 
     void Update()
     {
-        if(isClientMoving)
+        if(usersToInterpolate.Count > 0)
         {
-            if (progress < 1)
+            foreach(KeyValuePair<GameObject, UserInterpolation> user in usersToInterpolate)
             {
-                progress += Time.deltaTime * speed;
-                transform.position = Vector3.Lerp(start, client.desiredPosition, progress);
-            } else
-                isClientMoving = false;
-        }
-
-        if(otherUsers.Count > 0)
-        {
-            foreach(UserInterpolation user in otherUsers)
-            {
-                if(user.progress < 1f)
+                if(user.Value.progress < 1f)
                 {
-                    user.progress += Time.deltaTime * user.speed;
-                    user.go.transform.position = Vector3.Lerp(user.start, user.dest, user.progress);
-                } else
-                    user.isMoving = false;
-                // TODO: delete the users finished moving
+                    user.Value.progress += Time.deltaTime * user.Value.speed;
+                    user.Key.transform.position = Vector3.Lerp(user.Value.start, user.Value.dest, user.Value.progress);
+                }
+                else    user.Value.isMoving = false;
             }
         }
     }
 
     public void Move(GameObject go, Vector3 dest)
     {
-        if(go == gameObject)
-        {
-            start = transform.position;
-            client.desiredPosition = dest;
-            isClientMoving = true;
-            progress = 0f;
-        }
-        else
-        {
-            // if already contains the gameobject, move it to its destination and set a new destination
-            foreach(UserInterpolation user in otherUsers)
-                if(user.go == go)
-                {
-                    // TODO: do a unit test that will check the same gameobject is not being added again
-                    user.go.transform.position = user.dest;
-                    user.start = user.go.transform.position;
-                    user.progress = 0f;
-                    user.dest = dest;
-                    return;
-                }
-            otherUsers.Add(new UserInterpolation(go, dest, speed));
-        }
+        usersToInterpolate[go] = new UserInterpolation(go.transform.position, dest, speed);
     }
 }

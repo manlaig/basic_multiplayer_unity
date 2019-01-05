@@ -29,7 +29,7 @@ public class NetworkClient : MonoBehaviour
     public string id { get; private set; }
     public int packetNumber { get; private set; }
     public Dictionary<int, StateHistory> history;
-    public Vector3 desiredPosition;
+    [HideInInspector] public Vector3 desiredPosition;
     #endregion
 
     #region "Private Members"
@@ -86,10 +86,7 @@ public class NetworkClient : MonoBehaviour
     {
         /* using desiredPosition because transform.position is used for lerping to desired position */
         history.Add(++packetNumber, new StateHistory(desiredPosition));
-        if(history.Count >= 50)
-        {
-            // shrink the history
-        }
+        bool suc = history.Remove(packetNumber - 6);
     }
 
     void OnApplicationQuit()
@@ -107,18 +104,26 @@ public class NetworkClient : MonoBehaviour
             udp.Receive(buffer);
 
             string data = Encoding.Default.GetString(buffer);
-            int seqNumber = ParseSequenceNumber(data);
-
             string parsedID = Regex.Match(data, @"c\d+t").Value;
-            if(parsedID == "")  return;
-            
-            // means the server sending the unique id of the client
+            Debug.Log("Received: " + data);
+
+            // server sending the unique id of the client
             if(data[0] == 'a')
             {
                 id = parsedID;
                 Debug.Log("client ID: " + id);
                 return;
+            } else if(data[0] == 'e' && otherClients.ContainsKey(parsedID))
+            {
+                // means parsedID has disconnected
+                otherClientMover.usersToInterpolate.Remove(otherClients[parsedID]);
+                Destroy(otherClients[parsedID]);
+                otherClients.Remove(parsedID);
+                return;
             }
+            
+            int seqNumber = ParseSequenceNumber(data);
+            if(parsedID == "" || seqNumber == -1)  return;
 
             Vector3 posInPacket = ParsePosition(data);
             if(parsedID.Equals(id) && history.ContainsKey(seqNumber) && history[seqNumber].position != posInPacket)
@@ -136,10 +141,8 @@ public class NetworkClient : MonoBehaviour
     int ParseSequenceNumber(string data)
     {
         Match match = Regex.Match(data, @"(?<seqNumber>\d+) c\d+t");
-        int seqNumber = -1;
-        if(!int.TryParse(match.Groups["seqNumber"].Value, out seqNumber))
-            return -1;
-        return seqNumber;
+        int seqNumber;
+        return int.TryParse(match.Groups["seqNumber"].Value, out seqNumber) ? seqNumber : -1;
     }
 
     Vector3 ParsePosition(string data)
