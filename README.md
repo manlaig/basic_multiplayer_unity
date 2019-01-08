@@ -2,7 +2,7 @@
 
 This is an attempt to implement the concepts in Gabriel Gambetta's [Fast-Paced Multiplayer](http://www.gabrielgambetta.com/client-server-game-architecture.html) series.
 
-<img src="https://i.imgflip.com/2q21t0.gif" title="Multiple instances of an application connected through a server"/>
+<img src="https://i.imgflip.com/2q21t0.gif" title="Multiple clients connected through a server"/>
 
 ## Features
 
@@ -13,3 +13,7 @@ This is an attempt to implement the concepts in Gabriel Gambetta's [Fast-Paced M
 - Server Reconciliation
 
 - Entity Interpolation
+
+<img src="https://i.imgflip.com/2qlp50.gif" title="Entity Interpolation"/>
+
+<img src="https://i.imgflip.com/2qlpu8.gif" title="Entity Interpolation"/>
