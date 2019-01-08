@@ -127,7 +127,7 @@ public class NetworkClient : MonoBehaviour
             if(parsedID == "" || seqNumber == -1)  return;
 
             Vector3 posInPacket = ParsePosition(data);
-            if(parsedID.Equals(id) && history.ContainsKey(seqNumber) && history[seqNumber].position != posInPacket)
+            if(parsedID.Equals(id) && history.ContainsKey(seqNumber) && !history[seqNumber].position.Equals(posInPacket))
             {
                 Debug.Log("Server-Client position mismatch, you're at " + posInPacket);
                 /* the authorative server will control the user's position if they mismatch */

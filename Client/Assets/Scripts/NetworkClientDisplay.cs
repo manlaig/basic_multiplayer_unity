@@ -23,7 +23,7 @@ public class UserInterpolation
 public class NetworkClientDisplay : MonoBehaviour
 {
     [Tooltip("The step length while moving towards the desired position")]
-    [SerializeField] float speed = 10f;
+    [SerializeField] float speed = 8f;
     
     public Dictionary<GameObject, UserInterpolation> usersToInterpolate;
     NetworkClient client; 

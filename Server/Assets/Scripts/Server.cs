@@ -55,6 +55,7 @@ class Client
 
 public class Server : MonoBehaviour
 {
+    [SerializeField] float moveDistance = 1f;
     Socket socket;
     int port = 8080;
     int idAssignIndex = 0;
@@ -157,16 +158,14 @@ public class Server : MonoBehaviour
 
     void UpdatePosition(EndPoint addr, string input)
     {
-        float updateRate = 1f;
-
         if(input.Equals("a"))
-            clients[addr].position.x -= updateRate;
+            clients[addr].position.x -= moveDistance;
         else if(input.Equals("d"))
-            clients[addr].position.x += updateRate;
+            clients[addr].position.x += moveDistance;
         else if(input.Equals("w"))
-            clients[addr].position.y += updateRate;
+            clients[addr].position.y += moveDistance;
         else if(input.Equals("s"))
-            clients[addr].position.y -= updateRate;
+            clients[addr].position.y -= moveDistance;
     }
 
     void SendPositionToAllClients()
