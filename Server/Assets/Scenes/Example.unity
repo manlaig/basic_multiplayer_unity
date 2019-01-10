@@ -142,6 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveDistance: 0.25
+  frameWait: 3
 --- !u!4 &382111169
 Transform:
   m_ObjectHideFlags: 0

@@ -34,7 +34,7 @@ class Client
     public void UpdateStateHistory(int seqNumber)
     {
         history.Add(seqNumber, new Client.StateHistory(position));
-        bool suc = history.Remove(lastSeqNumber - 5);
+        bool suc = history.Remove(lastSeqNumber - 50);
     }
 
     public override string ToString()
@@ -55,7 +55,10 @@ class Client
 
 public class Server : MonoBehaviour
 {
+    [Tooltip("Distance to move at each move input (must match with client)")]
     [SerializeField] float moveDistance = 1f;
+    [Tooltip("Number of frames to wait until next processing")]
+    [SerializeField] int frameWait = 2;
     Socket socket;
     int port = 8080;
     int idAssignIndex = 0;
@@ -77,8 +80,8 @@ public class Server : MonoBehaviour
     }
 
     void Update()
-    {       
-        if(socket.Available != 0)
+    {
+        if(Time.frameCount % frameWait == 0 && socket.Available != 0)
         {
             byte[] packet = new byte[64];
             EndPoint sender = new IPEndPoint(IPAddress.Any, port);

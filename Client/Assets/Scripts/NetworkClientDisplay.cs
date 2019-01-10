@@ -22,7 +22,6 @@ public class UserInterpolation
 [RequireComponent(typeof(NetworkClient))]
 public class NetworkClientDisplay : MonoBehaviour
 {
-    [Tooltip("The step length while moving towards the desired position")]
     [SerializeField] float speed = 8f;
     
     public Dictionary<GameObject, UserInterpolation> usersToInterpolate;

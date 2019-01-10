@@ -87,7 +87,7 @@ public class NetworkClient : MonoBehaviour
     {
         /* using desiredPosition because transform.position is used for lerping to desired position */
         history.Add(++packetNumber, new StateHistory(desiredPosition));
-        bool suc = history.Remove(packetNumber - 6);
+        bool suc = history.Remove(packetNumber - 51);
     }
 
     void OnApplicationQuit()

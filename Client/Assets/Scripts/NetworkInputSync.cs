@@ -49,8 +49,8 @@ public class NetworkInputSync : MonoBehaviour
     public void Move(string userInput)
     {
         // to prevent mismatch between server and client
-        if(clientMover.usersToInterpolate.ContainsKey(gameObject) && clientMover.usersToInterpolate[gameObject].isMoving)
-            transform.position = client.desiredPosition;
+        //if(clientMover.usersToInterpolate.ContainsKey(gameObject) && clientMover.usersToInterpolate[gameObject].isMoving)
+            //transform.position = client.desiredPosition;
         Vector3 newPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
 
         if(userInput == "a")
