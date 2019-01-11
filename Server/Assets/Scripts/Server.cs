@@ -59,6 +59,7 @@ public class Server : MonoBehaviour
     [SerializeField] float moveDistance = 1f;
     [Tooltip("Number of frames to wait until next processing")]
     [SerializeField] int frameWait = 2;
+    [SerializeField] int maxClients = 2;
     Socket socket;
     int port = 8080;
     int idAssignIndex = 0;
@@ -91,7 +92,7 @@ public class Server : MonoBehaviour
 
             Debug.Log("Server received: " + info);
 
-            if(info[0] == 'n')
+            if(info[0] == 'n' && clients.Count < maxClients)
                 HandleNewClient(sender, info);
             else if(info[0] == 'e')
                 DisconnectClient(sender, info);

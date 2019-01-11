@@ -23,7 +23,7 @@ public class NetworkInputSync : MonoBehaviour
         if(client.id != "")
         {
             string userInput = GetMoveInput();
-            if(userInput != "")
+            if(userInput != "" && (!clientMover.usersToInterpolate.ContainsKey(gameObject) || !clientMover.usersToInterpolate[gameObject].isMoving))
             {
                 Move(userInput);
                 client.SendPacket(userInput);
