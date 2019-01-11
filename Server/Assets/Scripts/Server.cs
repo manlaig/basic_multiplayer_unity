@@ -146,10 +146,8 @@ public class Server : MonoBehaviour
         string id = match.Groups["id"].Value;
         string userInput = match.Groups["input"].Value;
         
-        if(id != "" && userInput != "")
+        if(id != "" && userInput != "" && clients[client].lastSeqNumber <= seqNumber)
         {
-            if(clients[client].lastSeqNumber > seqNumber)
-                return;
             if(!clients[client].history.ContainsKey(seqNumber))
             {
                 clients[client].UpdateStateHistory(seqNumber);

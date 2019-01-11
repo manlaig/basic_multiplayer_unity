@@ -30,11 +30,11 @@ public class NetworkClient : MonoBehaviour
     public string id { get; private set; }
     public int packetNumber { get; private set; }
     public Dictionary<int, StateHistory> history;
+    public Dictionary<string, GameObject> otherClients;
     [HideInInspector] public Vector3 desiredPosition;
     #endregion
 
     #region "Private Members"
-    Dictionary<string, GameObject> otherClients;
     NetworkClientDisplay otherClientMover;
     Socket udp;
     IPEndPoint endPoint;
@@ -130,8 +130,8 @@ public class NetworkClient : MonoBehaviour
             Vector3 posInPacket = ParsePosition(data);
             if(parsedID.Equals(id) && history.ContainsKey(seqNumber) && !history[seqNumber].position.Equals(posInPacket))
             {
-                Debug.Log("Server-Client position mismatch, you're at " + posInPacket);
                 /* the authorative server will control the user's position if they mismatch */
+                Debug.Log("Server-Client position mismatch, you're at " + posInPacket);
                 otherClientMover.usersToInterpolate.Remove(gameObject);
                 transform.position = posInPacket;
             }
@@ -164,7 +164,7 @@ public class NetworkClient : MonoBehaviour
 
     void AddOtherClient(string parsedID, Vector3 pos)
     {
-        if(opponent == null)    return;
+        if(!opponent)    return;
         GameObject go = Instantiate(opponent);
         go.name = parsedID;
         go.transform.position = pos;
