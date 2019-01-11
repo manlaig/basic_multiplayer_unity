@@ -7,25 +7,23 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     [SerializeField] Text leftScoreText, rightScoreText;
+
+    public static Ball instance { get; private set; }
+    Rigidbody2D rb;
     int leftScore = 0, rightScore = 0;
     bool gameStarted = false;
-    //NetworkClient client;
+    
     void Start()
     {
-        //client = GetComponent<NetworkClient>();
-        //StartBallMovement(); // change later
-    }
-
-    void Update()
-    {
-        //if(!gameStarted && client.otherClients.Count >= 1)
-            //StartBallMovement();
+        instance = this;
+        rb = GetComponent<Rigidbody2D>();
     }
     
-    void StartBallMovement()
+    public void StartBallMovement()
     {
-        transform.position = new Vector2(0, 0);
-        GetComponent<Rigidbody2D>().AddForce(new Vector2(300, 150));
+        rb.position = Vector2.zero;
+        rb.velocity = Vector2.zero;
+        rb.AddForce(new Vector2(100, 150));
     }
 
     void OnCollisionEnter2D(Collision2D col)
@@ -36,7 +34,7 @@ public class Ball : MonoBehaviour
                 leftScoreText.text = (++leftScore).ToString();
             else
                 rightScoreText.text = (++rightScore).ToString();
-            //StartBallMovement();
+            StartBallMovement();
         }
     }
 }

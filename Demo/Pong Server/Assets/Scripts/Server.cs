@@ -81,6 +81,9 @@ public class Server : MonoBehaviour
                 /* sending their initial data to both players */
                 SendPacket(player.Value.ToString(), addr);
                 SendPacket(newClient.ToString(), player.Key);
+                /* telling both clients to start the game (start the ball moving) */
+                SendPacket("s", addr);
+                SendPacket("s", player.Key);
                 break;
             }
         SendPacket("a " + id + " " + newClient.position.x + " " + newClient.position.y + " " + newClient.position.z, addr);

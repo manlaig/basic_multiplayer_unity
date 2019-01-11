@@ -123,6 +123,10 @@ public class NetworkClient : MonoBehaviour
                 Destroy(otherClients[parsedID]);
                 otherClients.Remove(parsedID);
                 return;
+            } else if(data[0] == 's')
+            {
+                // the server has told to start the game because both players connected
+                Ball.instance.StartBallMovement();
             }
             
             int seqNumber = ParseSequenceNumber(data);

@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveDistance: 0.5
-  frameWait: 2
+  frameWait: 1
   maxClients: 20
 --- !u!4 &221838830
 Transform:
