@@ -113,6 +113,7 @@ public class NetworkClient : MonoBehaviour
             if(data[0] == 'a')
             {
                 id = parsedID;
+                transform.position = ParsePosition(data);
                 Debug.Log("client ID: " + id);
                 return;
             } else if(data[0] == 'e' && otherClients.ContainsKey(parsedID))

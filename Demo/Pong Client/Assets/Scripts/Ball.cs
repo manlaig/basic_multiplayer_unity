@@ -13,7 +13,7 @@ public class Ball : MonoBehaviour
     void Start()
     {
         //client = GetComponent<NetworkClient>();
-        StartBallMovement(); // change later
+        //StartBallMovement(); // change later
     }
 
     void Update()
@@ -36,7 +36,7 @@ public class Ball : MonoBehaviour
                 leftScoreText.text = (++leftScore).ToString();
             else
                 rightScoreText.text = (++rightScore).ToString();
-            StartBallMovement();
+            //StartBallMovement();
         }
     }
 }
