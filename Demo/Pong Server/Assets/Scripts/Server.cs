@@ -9,6 +9,7 @@ using System.Text;
 public class Server : MonoBehaviour
 {
     #region "Inspector Members"
+    [SerializeField] int port = 8080;
     [Tooltip("Distance to move at each move input (must match with client)")]
     [SerializeField] float moveDistance = 1f;
     [Tooltip("Number of frames to wait until next processing")]
@@ -18,7 +19,6 @@ public class Server : MonoBehaviour
 
     #region "Private Members"
     Socket udp;
-    int port = 8080;
     int idAssignIndex = 0;
     Dictionary<EndPoint, Client> clients;
     #endregion
@@ -39,6 +39,17 @@ public class Server : MonoBehaviour
 
     void Update()
     {
+        foreach(KeyValuePair<EndPoint, Client> client in clients)
+        {
+            if(client.Value.position.x < 0 && client.Value.opponent != null)
+            {
+                client.Value.ballPosition = client.Value.opponent.ballPosition;
+                Vector3 ballPos = client.Value.ballPosition;
+                SendPacket("b " + ballPos.x + " " + ballPos.y + " " + ballPos.z, client.Key);
+                SendPacket("b " + ballPos.x + " " + ballPos.y + " " + ballPos.z, client.Value.opponent.address);
+            }
+        }
+
         if(Time.frameCount % frameWait == 0 && udp.Available > 0)
         {
             byte[] packet = new byte[64];
@@ -54,18 +65,34 @@ public class Server : MonoBehaviour
             else if(info[0] == 'e')
                 DisconnectClient(sender, info);
             else if(rec > 0)
-                HandleUserMoveInput(sender, info);
+            {
+                string id = Parser.ParseID(info);
+                int seqNumber = Parser.ParseSequenceNumber(info);
+                if(id == "" || seqNumber == -1)    return;
+
+                string userInput = Parser.ParseInput(info);
+                if(userInput != "")
+                    HandleUserMoveInput(sender, userInput, seqNumber);
+
+                if(Parser.isValidBallPosition(info))
+                {
+                    Vector3 ballPos = Parser.ParseBallPosition(info);
+                    /* if the player is on left side, position of their ball will mirror their enemy's */
+                    if(clients[sender].position.x > 0)
+                        clients[sender].ballPosition = ballPos;
+                }
+            }
         }
     }
 
     void HandleNewClient(EndPoint addr, string data)
     {
+        if(clients.ContainsKey(addr))
+            return;
         string id = "c" + idAssignIndex++ + "t";
         Debug.Log("Handling new client with id " + id);
 
-        Match match = Regex.Match(data,
-            @"n (?<x>-?([0-9]*[.])?[0-9]+) (?<y>-?([0-9]*[.])?[0-9]+) (?<z>-?([0-9]*[.])?[0-9]+)");
-        Vector3 pos = ParsePosition(match);
+        Vector3 pos = Parser.ParseInitialPosition(data);
         Client newClient = new Client(id, pos, addr);
 
         foreach(KeyValuePair<EndPoint, Client> player in clients)
@@ -92,29 +119,18 @@ public class Server : MonoBehaviour
 
     void DisconnectClient(EndPoint sender, string data)
     {
+        if(!clients.ContainsKey(sender))    return;
         /* letting the opponent know the client has disconnected */
         if(clients[sender].opponent != null)
             SendPacket(data, clients[sender].opponent.address);
-        if(clients.ContainsKey(sender))
-            clients.Remove(sender);
+        clients.Remove(sender);
     }
 
-    void HandleUserMoveInput(EndPoint client, string info)
+    void HandleUserMoveInput(EndPoint client, string userInput, int seqNumber)
     {
-        if(!clients.ContainsKey(client))
-            return;
-        Regex pattern = new Regex(@"(?<seqNumber>\d+) (?<id>c\d+t) (?<input>[ws])");
-        Match match = pattern.Match(info);
-        if(match.Value == "")   return;
-
-        int seqNumber = 0;
-        bool res = int.TryParse(match.Groups["seqNumber"].Value, out seqNumber);
-        if(!res)    return;
-
-        string id = match.Groups["id"].Value;
-        string userInput = match.Groups["input"].Value;
+        if(!clients.ContainsKey(client))    return;
         
-        if(id != "" && userInput != "" && clients[client].lastSeqNumber <= seqNumber)
+        if(clients[client].lastSeqNumber <= seqNumber)
         {
             if(!clients[client].history.ContainsKey(seqNumber))
             {
@@ -135,16 +151,6 @@ public class Server : MonoBehaviour
             clients[addr].position.y += moveDistance;
         else if(input.Equals("s"))
             clients[addr].position.y -= moveDistance;
-    }
-
-    Vector3 ParsePosition(Match match)
-    {
-        float x, y, z;
-        float.TryParse(match.Groups["x"].Value, out x);
-        float.TryParse(match.Groups["y"].Value, out y);
-        float.TryParse(match.Groups["z"].Value, out z);
-
-        return new Vector3(x, y, z);
     }
 
     void SendPacket(string str, EndPoint addr)

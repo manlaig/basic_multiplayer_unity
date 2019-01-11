@@ -1,11 +1,12 @@
 OSXUniversal
 PlayerPath?
-/Users/Ganaa/Desktop/PongClient.app
+/Users/manlai/Desktop/Pong Client.app
 SceneListBegin?
 Assets/Scenes/GameScene.unity
 SceneListEnd?
 984dcc0ba3707b7691fbdca8ff508d28 Unity.TextMeshPro.dll:TMPro.TMP_SelectionCaret
 01aa15e337e3a9c62f15153dfac6d589 Unity.TextMeshPro.dll:TMPro.TMP_Dropdown
+afc5b93a7b192de2dcb3832fe35a5c7e Assembly-CSharp.dll:.NetworkClientDisplay
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationPlayableAsset
 06f0fef534ca4c1d6064fd77a26bf722 UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationTrack
 8747051d8c53856e2def93af4f2a8b08 UnityEngine.Timeline.dll:UnityEngine.Timeline.AnimationPlayableAsset
@@ -154,11 +155,10 @@ fb6a1ea36b4f6ef5948d283d93760765 UnityEngine.GoogleAudioSpatializer.dll:UnityEng
 a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
 5fc094978ce3e3591a7500ed380d854a Unity.Analytics.DataPrivacy.dll:UnityEngine.Analytics.DataPrivacyButton
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
+be24d801677d6494c0ad6c2997ccf1b8 Assembly-CSharp.dll:.NetworkClient
 d791aa6007fa3640be1164ea75bb087d Unity.TextMeshPro.dll:TMPro.TMP_StyleSheet
 c6666661329916e218bee7f5e79e60f5 Unity.TextMeshPro.dll:TMPro.TextMeshPro
 3165968ba45c74472d279ba04455fccb Unity.TextMeshPro.dll:TMPro.TMP_ColorGradient
-8649814970b42d345b89944b862453cc Unity.TextMeshPro.dll:TMPro.TMP_SubMesh
-be24d801677d6494c0ad6c2997ccf1b8 Assembly-CSharp.dll:.NetworkClient
-99abe0ed810d3e248ee00f95c9a221c2 Assembly-CSharp.dll:.Ball
-afc5b93a7b192de2dcb3832fe35a5c7e Assembly-CSharp.dll:.NetworkClientDisplay
 0cc309299155e627ee90932dc75d9f54 Assembly-CSharp.dll:.NetworkInputSync
+8649814970b42d345b89944b862453cc Unity.TextMeshPro.dll:TMPro.TMP_SubMesh
+7f427e591f6bd9c445b54f467568e540 Assembly-CSharp.dll:.Ball

@@ -51,7 +51,7 @@ public class NetworkInputSync : MonoBehaviour
             newPos.y -= moveDistance;
         
         client.desiredPosition = newPos;
-        //interpolate client to newPos
+        /* interpolate client to newPos */
         clientMover.Move(gameObject, newPos);
     }
 }

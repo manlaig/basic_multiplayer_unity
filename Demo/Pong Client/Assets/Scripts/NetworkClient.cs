@@ -37,7 +37,7 @@ public class NetworkClient : MonoBehaviour
     #region "Private Members"
     NetworkClientDisplay otherClientMover;
     Socket udp;
-    IPEndPoint endPoint;
+    IPEndPoint server;
     #endregion
 
     void Awake()
@@ -52,10 +52,13 @@ public class NetworkClient : MonoBehaviour
         otherClientMover = GetComponent<NetworkClientDisplay>();
         otherClients = new Dictionary<string, GameObject>();
         history = new Dictionary<int, StateHistory>();
-        endPoint = new IPEndPoint(IPAddress.Parse(serverIP), port);
+        server = new IPEndPoint(IPAddress.Parse(serverIP), port);
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         udp.Blocking = false;
+    }
 
+    void Start()
+    {
         // n stands for new user
         // server will reply with a unique id for this user
         SendInitialReqToServer();
@@ -65,10 +68,10 @@ public class NetworkClient : MonoBehaviour
     void SendInitialReqToServer()
     {   
         string p = "n " + transform.position.x + " " + transform.position.y
-                + " " + transform.position.z;
+                        + " " + transform.position.z;
 
         byte[] packet = Encoding.ASCII.GetBytes(p);
-        udp.SendTo(packet, endPoint);
+        udp.SendTo(packet, server);
     }
 
     public void SendPacket(string str)
@@ -81,7 +84,7 @@ public class NetworkClient : MonoBehaviour
         }
         UpdateStateHistory();
         byte[] arr = Encoding.ASCII.GetBytes(packetNumber + " " + id + " " + str);
-        udp.SendTo(arr, endPoint);
+        udp.SendTo(arr, server);
     }
 
     public void UpdateStateHistory()
@@ -94,7 +97,7 @@ public class NetworkClient : MonoBehaviour
     void OnApplicationQuit()
     {
         byte[] arr = Encoding.ASCII.GetBytes("e " + id);
-        udp.SendTo(arr, endPoint);
+        udp.SendTo(arr, server);
         udp.Close();
     }
 
@@ -125,8 +128,16 @@ public class NetworkClient : MonoBehaviour
                 return;
             } else if(data[0] == 's')
             {
+                Debug.Log("Game starting");
                 // the server has told to start the game because both players connected
                 Ball.instance.StartBallMovement();
+                return;
+            } else if(data[0] == 'b')
+            {
+                /*Vector3 pos = ParseBallPosition(data);
+                Debug.Log(pos);
+                Ball.instance.gameObject.transform.position = pos;
+                return;*/
             }
             
             int seqNumber = ParseSequenceNumber(data);
@@ -163,7 +174,18 @@ public class NetworkClient : MonoBehaviour
         float.TryParse(match.Groups["x"].Value, out x);
         float.TryParse(match.Groups["y"].Value, out y);
         float.TryParse(match.Groups["z"].Value, out z);
+        return new Vector3(x, y, z);
+    }
 
+    Vector3 ParseBallPosition(string data)
+    {  
+        Match match = Regex.Match(data,
+            @"b (?<x>-?([0-9]*[.])?[0-9]+) (?<y>-?([0-9]*[.])?[0-9]+) (?<z>-?([0-9]*[.])?[0-9]+)");
+
+        float x, y, z;
+        float.TryParse(match.Groups["x"].Value, out x);
+        float.TryParse(match.Groups["y"].Value, out y);
+        float.TryParse(match.Groups["z"].Value, out z);
         return new Vector3(x, y, z);
     }
 

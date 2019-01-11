@@ -899,8 +899,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7508ff7cc4bee4f668b4d83c9d73f2bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverIP: 192.168.1.153
-  port: 8080
+  serverIP: 192.168.1.164
+  port: 1025
   opponent: {fileID: 4104426951725835621, guid: 55655bf5de96c401c9bb22a88ddd8694,
     type: 3}
   desiredPosition: {x: 0, y: 0, z: 0}
@@ -1316,6 +1316,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftScoreText: {fileID: 1324339094}
   rightScoreText: {fileID: 1434655591}
+  client: {fileID: 1518535843}
 --- !u!1001 &4104426952771162190
 PrefabInstance:
   m_ObjectHideFlags: 0

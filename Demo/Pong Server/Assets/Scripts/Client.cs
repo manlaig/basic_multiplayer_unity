@@ -21,6 +21,8 @@ public class Client
     public Vector3 position;
     public EndPoint address;
     public Client opponent; // opponent for Pong
+    /* the position of their ball in Pong */
+    public Vector3 ballPosition;
 
     public Client(string i, Vector3 p, EndPoint addr)
     {
@@ -29,6 +31,7 @@ public class Client
         address = addr;
         opponent = null;
         lastSeqNumber = 0;
+        ballPosition = Vector3.zero;
         history = new Dictionary<int, StateHistory>();
         history.Add(0, new StateHistory(position));
     }
