@@ -7,7 +7,7 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     [SerializeField] Text leftScoreText, rightScoreText;
-    [SerializeField] NetworkClient client;
+    //[SerializeField] NetworkClient client;
 
     public static Ball instance { get; private set; }
     Rigidbody2D rb;

@@ -55,10 +55,7 @@ public class NetworkClient : MonoBehaviour
         server = new IPEndPoint(IPAddress.Parse(serverIP), port);
         udp = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         udp.Blocking = false;
-    }
 
-    void Start()
-    {
         // n stands for new user
         // server will reply with a unique id for this user
         SendInitialReqToServer();
@@ -132,12 +129,6 @@ public class NetworkClient : MonoBehaviour
                 // the server has told to start the game because both players connected
                 Ball.instance.StartBallMovement();
                 return;
-            } else if(data[0] == 'b')
-            {
-                /*Vector3 pos = ParseBallPosition(data);
-                Debug.Log(pos);
-                Ball.instance.gameObject.transform.position = pos;
-                return;*/
             }
             
             int seqNumber = ParseSequenceNumber(data);

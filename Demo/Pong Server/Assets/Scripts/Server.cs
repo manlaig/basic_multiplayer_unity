@@ -39,17 +39,6 @@ public class Server : MonoBehaviour
 
     void Update()
     {
-        foreach(KeyValuePair<EndPoint, Client> client in clients)
-        {
-            if(client.Value.position.x < 0 && client.Value.opponent != null)
-            {
-                client.Value.ballPosition = client.Value.opponent.ballPosition;
-                Vector3 ballPos = client.Value.ballPosition;
-                SendPacket("b " + ballPos.x + " " + ballPos.y + " " + ballPos.z, client.Key);
-                SendPacket("b " + ballPos.x + " " + ballPos.y + " " + ballPos.z, client.Value.opponent.address);
-            }
-        }
-
         if(Time.frameCount % frameWait == 0 && udp.Available > 0)
         {
             byte[] packet = new byte[64];
@@ -73,14 +62,6 @@ public class Server : MonoBehaviour
                 string userInput = Parser.ParseInput(info);
                 if(userInput != "")
                     HandleUserMoveInput(sender, userInput, seqNumber);
-
-                if(Parser.isValidBallPosition(info))
-                {
-                    Vector3 ballPos = Parser.ParseBallPosition(info);
-                    /* if the player is on left side, position of their ball will mirror their enemy's */
-                    if(clients[sender].position.x > 0)
-                        clients[sender].ballPosition = ballPos;
-                }
             }
         }
     }

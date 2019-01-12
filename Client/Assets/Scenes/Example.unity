@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.5748171, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -296,7 +296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730c67013112c41f6af9d259f4c786e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverIP: 192.168.1.153
+  serverIP: 192.168.1.164
   port: 8080
   desiredPosition: {x: 0, y: 0, z: 0}
 --- !u!4 &1066636334
@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40fccc065bd914405b82c8cce8494f41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveDistance: 0.25
+  moveDistance: 0.5
 --- !u!114 &1066636338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,4 +383,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6687d3a821f114330b97b9e357d2722e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 50
+  speed: 25
