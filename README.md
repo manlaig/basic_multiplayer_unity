@@ -17,3 +17,9 @@ This is an attempt to implement the concepts in Gabriel Gambetta's [Fast-Paced M
 <img src="https://i.imgflip.com/2qlp50.gif" title="Entity Interpolation"/>
 
 <img src="https://i.imgflip.com/2qlpu8.gif" title="Entity Interpolation"/>
+
+## Demo
+
+Connecting 2 clients through a server to play Pong
+
+<img src="https://i.imgflip.com/2qxw9x.gif" title="Pong"/>
